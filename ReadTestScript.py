@@ -9,7 +9,7 @@ class ReadNameScripts:
         result = []
         import sys
         result = os.path.split(sys.path[0])
-        result = result[0] + '/' + result[1]
+        result = result[0] + '/' #+ result[1]
         return result
 
     def listScripts(self):

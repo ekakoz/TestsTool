@@ -23,17 +23,19 @@ class TestToolHelp(unittest.TestCase):
     def runScriptArg(self, arg):
         scr = ReadTestScript.ReadNameScripts('dir')
         dirpath = scr.pathProject()
-        self.process = subprocess.Popen(['python', dirpath + self.path + self.name+'.py'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        self.process = subprocess.Popen(['python', dirpath + self.path +'/'+ self.name+'.py'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         self.process.stdin.write(arg)
         self.process.stdin.close()
         self.line = self.process.stdout.read()
         return self.line
 
     def assertFunction(self, arg):
-        imp = importlib.import_module('math_const', 'mathScript')
-        return unittest.TestCase('run').assertEqual(str(type(imp.math_const)), "<type 'function'>")
 
-    #def assertType(self, arg):
+        #imp = importlib.import_module('math_const', 'mathScript')
+
+        return unittest.TestCase('run').assertEqual(str(type(eval('self.module.'+arg))), "<type 'function'>")
+
+   #def assertType(self, arg):
     #    return unittest.TestCase('run').assertEqual(str(type(arg)), "<type 'function'>")
 
     @staticmethod

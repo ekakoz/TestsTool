@@ -14,20 +14,23 @@ class TestCase(unittest.TestCase):
 
 
     def test_1(self):
-        module = testModule.TestToolHelp('math_const')
+#        module = testModule.TestToolHelp('math_const')
+        module = testModule.TestToolHelp('math_const', 'mathScript')
         res = module.runScriptArg("pi:4")
         self.assertEquals(res,'3.14161\n')
 
     def test_2(self):
-        module = testModule.TestToolHelp('math_const')
+        module = testModule.TestToolHelp('math_const', 'mathScript')
         res = module.runScriptArg("pi:4")
         self.assertEquals(res,'3.1416\n')
 
     def test_3(self):
-        script = testModule.TestToolHelp('math_const')
+        script = testModule.TestToolHelp('math_const', 'mathScript')
         script.assertFunction('math_const')
 
 
 if __name__ == '__main__':
-
-    testModule.TestToolHelp.report( )
+    import importlib
+    mod = importlib.import_module('testModule', 'TestTool')
+    print mod
+    mod.TestToolHelp.report( )

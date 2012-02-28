@@ -5,6 +5,13 @@ class ReadNameScripts:
     def __init__(self, dirName = None):
         self.__dirName =  dirName or []
 
+    def pathProject(self):
+        result = []
+        import sys
+        result = os.path.split(sys.path[0])
+        result = result[0] + '/' + result[1]
+        return result
+
     def listScripts(self):
         result = []
         for root, dirs, files in os.walk(self.__dirName):
@@ -43,5 +50,6 @@ def my_import(name):
 
 
 if __name__ == "__main__":
-    import importlib
+    k = ReadNameScripts('/home/katrin/PycharmProjects/TestTool/tests/')
+    print k.pathProject()
   

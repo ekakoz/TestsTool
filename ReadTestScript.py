@@ -24,9 +24,10 @@ class ReadNameScripts:
         result = []
         for root, dirs, files in os.walk(self.__dirName):
             for name in files:
+                
                 (n , s)= os.path.splitext(str(name))
-
-                result.append(n)
+                if s == '.py':
+                    result.append(n)
 
         return result
 
@@ -51,5 +52,5 @@ def my_import(name):
 
 if __name__ == "__main__":
     k = ReadNameScripts('/home/katrin/PycharmProjects/TestTool/tests/')
-    print k.pathProject()
+    print k.listScriptsNames()
   

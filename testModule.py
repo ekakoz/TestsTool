@@ -17,7 +17,7 @@ class TestToolHelp(unittest.TestCase):
     def runScript(self):
         scr = ReadTestScript.ReadNameScripts('dir')
         dirpath = scr.pathProject()
-        self.process = subprocess.Popen(['python', dirpath + self.path + self.name+'.py'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        self.process = subprocess.Popen(['python', dirpath + self.path + '/' + self.name+'.py'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         return self.process
 
     def runScriptArg(self, arg):
@@ -45,19 +45,29 @@ class TestToolHelp(unittest.TestCase):
         else:
             dir = str(sys.path[0])
         scr = ReadTestScript.ReadNameScripts(dir)
+        s = sys.path
         log_file = str(sys.path[0]) + '/report.txt'
         f = open(log_file, "a") #open file for appending log
         p = scr.listScriptsNames()
     #runner = unittest.TextTestRunner(f, verbosity=2)
-        p1 = scr.listScriptsNames()
+        #p1 = scr.listScriptsNames()
         for each in scr.listScriptsNames():
-            #f.writelines("\n" + str(each) + "\n")
+            f.writelines("\n\n" + str(each) + "\n")
             l = unittest.TestLoader().loadTestsFromTestCase(imp.TestCase)
-            
+            res = 0
+            n = 0
             for line in unittest.TestLoader().loadTestsFromTestCase(imp.TestCase):
-                res = unittest.TestResult()
-                unittest.TextTestRunner(verbosity=2).run(line)
-
+                k = unittest.TextTestRunner(verbosity=2).run(line)
+                n = n + 1
+                if k.wasSuccessful():
+                    res = res + 1
+                    f.writelines(str(line._testMethodName))
+                    f.writelines(" -\t1\n\n")
+                else:
+                    f.writelines(str(line._testMethodName))
+                    f.writelines(" -\t0\n\n")
+            f.write("Result = " + str(res) + "/" + str(n) + "\n")
+            f.writelines("___________")
         del sys.argv[0:]
 
 if __name__ == "__main__":

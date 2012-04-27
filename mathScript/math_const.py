@@ -3,12 +3,13 @@ __author__ = 'katrin'
 # -*- coding: utf-8 -*-
 from math import *
 import sys, os
-def math_const():
+def math_const(*args, **kwargs):
 
     try:
-        str = raw_input()
-       # str1 = raw_input()
+        #str = raw_input()
+        #str1 = raw_input()
         #str = sys.argv[1]
+        #str = args[0]
         str = str.split(':')
         const = eval(str[0])
         t = int(str[1])
@@ -24,8 +25,7 @@ def math_const():
 
 
 if __name__ == '__main__':
-    math_const()
-    #cmd = 'python ' + str(sys.argv[1]) + str(sys.argv[2])
-    
 
-
+    math_const('pi:4')
+    math_const('e:19')
+    math_const('er:19')

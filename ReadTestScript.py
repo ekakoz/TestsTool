@@ -2,7 +2,7 @@ __author__ = 'katrin'
 import os
 class ReadNameScripts:
 
-    def __init__(self, dirName = None):
+    def __init__(self, dirName = '.'):
         self.__dirName =  dirName or []
 
     def pathProject(self):
@@ -52,5 +52,13 @@ def my_import(name):
 
 if __name__ == "__main__":
     k = ReadNameScripts('/home/katrin/PycharmProjects/TestTool/tests/')
-    print k.listScriptsNames()
-  
+   # print k.listScriptsNames()
+
+    import inspect
+    print inspect.getsource(ReadNameScripts)
+    l= inspect.getargspec(my_import)
+    print type(l)
+    print l
+    print inspect.getmoduleinfo('ReadNameScript.py')
+    print __name__
+

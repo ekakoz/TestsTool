@@ -1,0 +1,69 @@
+
+
+test_math_dir
+test_1 -	0
+
+test_2 -	1
+
+test_3 -	1
+
+Result = 2/3
+___________
+
+test_math_dir
+test_1 -	0
+
+test_2 -	1
+
+test_3 -	1
+
+Result = 2/3
+___________
+
+test_math_dir
+test_1 -	0
+
+test_2 -	0
+
+test_3 -	1
+
+test_4 -	0
+
+Result = 1/4
+___________
+
+test_math_dir
+test_1 -	0
+
+test_2 -	0
+
+test_3 -	1
+
+test_4 -	0
+
+Result = 1/4
+___________
+
+test_math_dir
+test_1 -	0
+
+test_2 -	0
+
+test_3 -	1
+
+test_4 -	0
+
+Result = 1/4
+___________
+
+test_math_dir
+test_1 -	0
+
+test_2 -	0
+
+test_3 -	1
+
+test_4 -	1
+
+Result = 2/4
+___________

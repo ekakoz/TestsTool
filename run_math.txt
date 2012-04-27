@@ -1,0 +1,3 @@
+math_const<('pi:4')<10
+math_const<('e:19')<20
+math_const<('er:19')<30

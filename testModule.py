@@ -67,34 +67,44 @@ class TestToolHelp(unittest.TestCase):
 
 
     #@staticmethod
-    def report_2(self, task, script):
-        f = open(task, "r")
+    def report_2(self, task, sampler, script):
+        file = open(task, "r")
         mark = []
-        for line in f:
+        ans = []
+        student = TestToolHelp(script)
+        print "STUD: ", student.name
+        for line in file:
             #print line
             line = (line.split('<'))
             mark.append(line)
         print len(mark)
+        #Run sampler script and remember answers to ans []
+        for i in range(0, len(mark), 1):
+            print "name" , mark[i][0] ,"run with args", mark[i][1]  #run line
+            f = ret_function(2)
+            f2 = f(eval('self.module.' + mark[i][0]))
+            f3 = f2(eval(mark[i][1]))
+
+            ans.append(f3)
+            print "Answer = " , ans[i]
+
+        #Then run student script and compare with sampler answers
         for i in range(0, len(mark), 1):
 
             print "name" , mark[i][0] ,"run with args", mark[i][1]  #run line
-            l = dec_call(2)
-            print "L = " , l
-            l2 = l(eval('self.module.' + mark[i][0]))
-            print "L2 = " , l2
-            l3 = l2(eval(mark[i][1]))
-            print "L3 = " , l3
+            f = dec_call(2, ans[i])
 
+            f2 =f(eval('student.module.' + mark[i][0]))
+
+            f3 = f2(eval(mark[i][1]))
             #ret_function - return result of function
-            l = ret_function(2)
-            #print "R = " , l
-            l2 = l(eval('self.module.' + mark[i][0]))
-            #print "R2 = " , l2
-            l3 = l2(eval(mark[i][1]))
-            print "R3 = " , l3
+            f = ret_function(2)
+            f2 = f(eval('student.module.' + mark[i][0]))
+            f3 = f2(eval(mark[i][1]))
+            print "Answer = " , f3
 
 
-        f.close()
+        file.close()
             #printf mark[i][1] #mark line
 
     @staticmethod
@@ -145,17 +155,21 @@ def decorator_for_decorator(decor):
 
 
 @decorator_for_decorator
-def dec_call(fn, point):
-    """
-    a  - for point
+def dec_call(fn, point,ans ):
+    """Decorator compare answers.
+    It is return summary point for one run (with one set of arguments)
+    It works with function.
+
     """
     def wrap(*args, **kwargs):
         try:
-            if fn(*args, **kwargs) == True:
+            if fn(*args, **kwargs) == ans:
                 print "NAME:\t" , fn.__name__ , args , ' = ' , point
-            return point
+                return point
+            print "-POINT"
+            return -point
         except :
-            print "NAME:\t" , fn.__name__ , args , ' = ' , point
+            print "NAME (- point):\t" , fn.__name__ , args , ' = ' , point
             print inspect.getargspec(fn)
             return -point
     return wrap
@@ -165,15 +179,6 @@ def ret_function(fn, point):
     def wrap (*args, **kwargs):
         return fn(*args, **kwargs)
     return wrap
-
-@ret_function(1)
-def ololol2():
-    return "ERROR"
-
-print ololol2()
-@dec_call(1)
-def ololo(a = 5, b = 6):
-    print "OLOOLOOOLOOO"
 
 
 
@@ -197,25 +202,23 @@ def interrogate(item):
 
 import ReadTestScript
 
-def temporary(a = 5):
-    print "OK"
 
 if __name__ == "__main__":
-    t = TestToolHelp('math_const')
-#    t.report_2('run_math.txt', t.name)
-#    t.run_def('math_const(\'er:19\')')
-#    t.module.math_const('er:19')
-    t.report_2('run_math.txt', t.module)
-    interrogate(t.module)
+    sampler = TestToolHelp('math_const')
+    stud = 'math_const_2'
+
+
+
+    #run_math.txt - file with function names and arguments. Now it is parted via "<"
+    sampler.report_2('run_math.txt',  sampler.module, stud )
+
+
+
+#    interrogate(t.module)
 
     ################################################
 
-    #print ololo(5, 6 ,'0')
-    #print ololo()
 
-    l = dec_call(2)
-    l2 = l(temporary)
-    l3 = l2()
 
 
 #    script_files = ReadTestScript.ReadNameScripts('tests')

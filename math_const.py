@@ -25,6 +25,15 @@ def math_const(str):#*args, **kwargs):
         #print "Error"
         return "Error"
 
+math_const.test = [
+    { 'in': ("pi:3"), 'grade': 1 },
+    { 'in': ("e:4"), 'grade': 2 },
+    { 'in': ("e:4"), 'grade': 5 },
+    { 'in': ("pi:4"), 'grade': 1},
+    { 'in': ("h:19"), 'grade': 2}
+]
+
+print math_const.test
 
 
 

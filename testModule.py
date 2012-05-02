@@ -60,60 +60,81 @@ class TestToolHelp(unittest.TestCase):
     def assertType(self, arg, typeRes):
         return unittest.TestCase('run').assertEqual(str(type(eval('self.module.'+arg))), ("<type '"+ typeRes + "'>"))
 
-
-    #def assert_type(self):
-
-
-    def report_2(self, task, student):
-        file = open(task, "r")
-        mark = []
+    def report_2(self, function_name, student):
         ans = []
         grade = 0
-
+        mark = []
         file_grade = open((str(student.name)+'.log'),"w")
-
-
-        for line in file:
-            #print line
-            line = (line.split('<'))
-            mark.append(line)
-
-        #Run sampler script and remember answers to ans []
-        for i in range(0, len(mark), 1):
-            #print "name" , mark[i][0] ,"run with args", mark[i][1]  #run line
-            f = ret_function(2)
-            f2 = f(eval('self.module.' + mark[i][0]))
-            f3 = f2(eval(mark[i][1]))
-
+        for i in  range(len(eval('self.module.' + function_name + '.test'))):
+            print i
+            mark.append(eval('self.module.' + function_name + '.test' + str([i])))
+            print "PPPP" , mark
+            f = ret_function((mark[i]['grade']))
+            f2 = f(eval('self.module.' + function_name))
+            f3 = f2((mark[i]['in']))
             ans.append(f3)
-            #print "Answer = " , ans[i]
+        print type(mark)
+        print "ans[] = " , (ans)
+        for i in range(0, len(ans), 1):
 
-        #Then run student script and compare with sampler answers
-        for i in range(0, len(mark), 1):
+            f = dec_call(ans[i][1], ans[i][0])
+            f2 =f(eval('student.module.' + function_name))
+            f3 = f2((mark[i]['in']))
             file_grade.write(str(i+1) + '.\t')
-            file_grade.write(mark[i][0] + " run with args " + mark[i][1] + '\n')  #run line
-            f = dec_call(2, ans[i])
-
-
-            f2 =f(eval('student.module.' + mark[i][0]))
-
-            f3 = f2(eval(mark[i][1]))
+            #print "MARK" , mark[:1]
+            file_grade.write((function_name + " RUN WITH ARGS: (" + (mark[i]['in']) + "); POINT = " + str((mark[i]['grade']))) + '\n')  #run line
             file_grade.write("POINT = " + str(f3) + "\n")
-            if f3 < 0:
-                file_grade.write("Expected result: " + ans[i] + '\n')
+            if f3 == 0:
+                #print ("Expected result: " + ans[i][0] + '\n')
+                file_grade.write("Expected result: " + ans[i][0] + '\n')
             grade = grade + f3
-#            ret_function - return result of function
-#            f = ret_function(2)
-#            f2 = f(eval('student.module.' + mark[i][0]))
-#            f3 = f2(eval(mark[i][1]))
-#            print "grade = " ,
-#            print "Answer = " , f3
-
-
         file_grade.write("\nRESULT GRADE = " + str(grade))
-
         file_grade.close()
-        file.close()
+#    def report_2(self, task, student):
+#        file = open(task, "r")
+#        mark = []
+#        ans = []
+#        grade = 0
+#
+#        file_grade = open((str(student.name)+'.log'),"w")
+#
+#        for line in file:
+#            #print line
+#            line = (line.split('~'))
+#            mark.append(line)
+#
+#        #Run sampler script and remember answers to ans []
+#
+#        for i in range(0, len(mark), 1):
+#            #print "name" , mark[i][0] ,"run with args", mark[i][1]  #run line
+#            f = ret_function(int(mark[i][2]))
+#            f2 = f(eval('self.module.' + mark[i][0]))
+#            f3 = f2(eval(mark[i][1]))
+#            print "f3 = " , f3[0]
+#            ans.append(f3)
+#            print "ans[] = " , ans[0][0]
+#            #print "Answer = " , ans[i]
+#
+#        #Then run student script and compare with sampler answers
+#        for i in range(0, len(mark), 1):
+#            file_grade.write(str(i+1) + '.\t')
+#            file_grade.write(mark[i][0] + " run with args " + mark[i][1] + " point = " + str(int(mark[i][2])) + '\n')  #run line
+#            f = dec_call(ans[i][1], ans[i][0])
+#
+#
+#            f2 =f(eval('student.module.' + mark[i][0]))
+#            #Run student script with args
+#            f3 = f2(eval(mark[i][1]))
+#            file_grade.write("POINT = " + str(f3) + "\n")
+#            if f3 == 0:
+#                file_grade.write("Expected result: " + ans[i][0] + '\n')
+#            grade = grade + f3
+#
+#
+#        file_grade.write("\nRESULT GRADE = " + str(grade))
+#
+#        file_grade.close()
+#        file.close()
 
 
     @staticmethod
@@ -176,18 +197,24 @@ def dec_call(fn, point, ans):
             if fn(*args, **kwargs) == ans:
                 print "NAME:\t" , fn.__name__ , args , ' = ' , point
                 return point
-            print "-POINT"
-            return -point
+            t = inspect.getargspec(fn)
+            print dir(t)
+            print t
+            print "Zero POINT"
+            grade = 0
+            return grade
         except :
             print "NAME (- point):\t" , fn.__name__ , args , ' = ' , point
             print inspect.getargspec(fn)
-            return -point
+            grade = 0
+            return grade
     return wrap
 
 @decorator_for_decorator
 def ret_function(fn, point):
     def wrap (*args, **kwargs):
-        return fn(*args, **kwargs)
+
+        return fn(*args, **kwargs), point
     return wrap
 
 #
@@ -280,14 +307,14 @@ def interspect(item):
             #print "KEY: ", key
             #print "ARGS: ", inspect.getargspec(eval('item.' + key))
             dict_member[key] = inspect.getargspec(eval('item.' + key))
-            #print dict_member
+
         elif str(type(eval('item.' + key))) == "<type 'classobj'>":
             #print "KEY: ", key
             class_member[key] =  eval('dir(item.' + key + ')')
             for k in class_member[key]:
                 if str(type(eval('item.' + key + '.' + k))) == "<type 'instancemethod'>":
                     method_member [k]=  (inspect.getargspec((eval('item.' + key + '.' + k))))
-                    #print "method: " , method_member[k]
+
     return dict_member, class_member, method_member
 
 def cmp_function(sampler, task):
@@ -295,10 +322,22 @@ def cmp_function(sampler, task):
     for i in range(3):
         for key in sampler[i]:
             if key in task[i]:
-                if sampler[i][key] == task[i][key]:
+                if len(sampler[i][key].args) == len(task[i][key].args):
                     result = True
+                elif len(sampler[i][key].args) <= len(task[i][key].args):
+                    print "STUDENT " , task[i][key]
+                    print "sampler " , sampler[i][key]
+                    return False
+                elif (task[i][key].varargs) <> None :
+                    result = True
+                elif (task[i][key].keywords) <> None:
+                    result = True
+                else :
+
+                    return  False
 
             else:
+                print "nok"
                 return False
 
     return True
@@ -310,11 +349,14 @@ if __name__ == "__main__":
     sampler_data =  interspect(sampler.module)
     stud = TestToolHelp('math_const_2')
     stud_data = interspect(stud.module)
-
+    print sampler.module.math_const.test
     sampler_class = TestToolHelp('simple_class')
 
     if (cmp_function(sampler_data, stud_data)):
-        sampler.report_2('run_math.txt', stud )
+        sampler.report_2(sampler.name, stud)
+        #sampler.report_2('run_math.txt', stud )
+    else:
+        print "FALSE COMPARE"
 
     #print interspect(sampler_class.module)
 

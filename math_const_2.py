@@ -4,7 +4,7 @@ __author__ = 'katrin'
 
 from math import *
 import sys, os
-def math_const(str):
+def math_const(str = []):
 
     try:
         str = str.split(':')

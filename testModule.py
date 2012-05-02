@@ -6,11 +6,6 @@ import unittest, importlib, subprocess, sys, ReadTestScript, inspect
 
 class TestToolHelp(unittest.TestCase):
 
-#    def __init__(self, name):
-#        self.module = importlib.import_module(name)
-#        name = name of file with script
-#        path = default is current directory, else current_directory/next
-
     def __init__(self, name, path = '.' ):
         self.path = path
         self.name = name
@@ -66,46 +61,60 @@ class TestToolHelp(unittest.TestCase):
         return unittest.TestCase('run').assertEqual(str(type(eval('self.module.'+arg))), ("<type '"+ typeRes + "'>"))
 
 
-    #@staticmethod
-    def report_2(self, task, sampler, script):
+    #def assert_type(self):
+
+
+    def report_2(self, task, student):
         file = open(task, "r")
         mark = []
         ans = []
-        student = TestToolHelp(script)
-        print "STUD: ", student.name
+        grade = 0
+
+        file_grade = open((str(student.name)+'.log'),"w")
+
+
         for line in file:
             #print line
             line = (line.split('<'))
             mark.append(line)
-        print len(mark)
+
         #Run sampler script and remember answers to ans []
         for i in range(0, len(mark), 1):
-            print "name" , mark[i][0] ,"run with args", mark[i][1]  #run line
+            #print "name" , mark[i][0] ,"run with args", mark[i][1]  #run line
             f = ret_function(2)
             f2 = f(eval('self.module.' + mark[i][0]))
             f3 = f2(eval(mark[i][1]))
 
             ans.append(f3)
-            print "Answer = " , ans[i]
+            #print "Answer = " , ans[i]
 
         #Then run student script and compare with sampler answers
         for i in range(0, len(mark), 1):
-
-            print "name" , mark[i][0] ,"run with args", mark[i][1]  #run line
+            file_grade.write(str(i+1) + '.\t')
+            file_grade.write(mark[i][0] + " run with args " + mark[i][1] + '\n')  #run line
             f = dec_call(2, ans[i])
+
 
             f2 =f(eval('student.module.' + mark[i][0]))
 
             f3 = f2(eval(mark[i][1]))
-            #ret_function - return result of function
-            f = ret_function(2)
-            f2 = f(eval('student.module.' + mark[i][0]))
-            f3 = f2(eval(mark[i][1]))
-            print "Answer = " , f3
+            file_grade.write("POINT = " + str(f3) + "\n")
+            if f3 < 0:
+                file_grade.write("Expected result: " + ans[i] + '\n')
+            grade = grade + f3
+#            ret_function - return result of function
+#            f = ret_function(2)
+#            f2 = f(eval('student.module.' + mark[i][0]))
+#            f3 = f2(eval(mark[i][1]))
+#            print "grade = " ,
+#            print "Answer = " , f3
 
 
+        file_grade.write("\nRESULT GRADE = " + str(grade))
+
+        file_grade.close()
         file.close()
-            #printf mark[i][1] #mark line
+
 
     @staticmethod
     def report():
@@ -140,6 +149,7 @@ class TestToolHelp(unittest.TestCase):
             f.write("Result = " + str(res) + "/" + str(n) + "\n")
             f.writelines("___________")
         del sys.argv[0:]
+
 def decorator_for_decorator(decor):
     """Create decorator
     This function is used as decorator.
@@ -155,7 +165,7 @@ def decorator_for_decorator(decor):
 
 
 @decorator_for_decorator
-def dec_call(fn, point,ans ):
+def dec_call(fn, point, ans):
     """Decorator compare answers.
     It is return summary point for one run (with one set of arguments)
     It works with function.
@@ -180,15 +190,68 @@ def ret_function(fn, point):
         return fn(*args, **kwargs)
     return wrap
 
-
+#
+#def return_members(item):
+#    member = []
+#    dict =  item.module.__dict__
+#
+#    for key in dict:
+#        t = type(eval('tempScript.module.' + key))
+#        if str(t) == "<type 'function'>":
+#            print "User function = " , key
+#            print (eval('tempScript.module.' + key))
 
 def interrogate(item):
-    """Print useful information about item."""
+    """return useful information about item.
+
+    """
     if hasattr(item, '__name__'):
         print "NAME:\t\t", item.__name__
     if hasattr(item, '__class__'):
         print "CLASS:\t\t", item.__class__.__name__
+
+
     print "ID:\t\t\t", id(item)
+    print "TYPE:\t\t", type(item)
+    #print "VALUE:\t\t", repr(item)
+    if str(type(item)) == "<type 'function'>":
+        print "ARGSPEC:\t", inspect.getargspec(item)
+
+    print "CALLABLE:\t",
+
+    if callable(item):
+        print "Yes"
+    else:
+        print "No"
+
+def interrogate2(item):
+    """return useful information about module.
+
+    """
+    information = []
+    if hasattr(item, '__name__'):
+        print "NAME:\t\t", item.__name__
+        information.append(item.__name__)
+    if hasattr(item, '__class__'):
+        print "CLASS:\t\t", item.__class__.__name__
+        information.append(item.__class__.__name__)
+
+#        print information[0]
+#    print type(item)
+#    dict =  item.__dict__
+#    print "STR = " , str(item.name)
+#    print "STR - module = " , (str(eval(item.module + '.math_const')))
+#    for key in dict:
+#        t = type(eval('item.module.' + key))
+#        if str(t) == "<type 'function'>":
+#            print "User function = " , key
+#            fn = (eval('item.module.' + key))
+#            print "ArgSpec: " , inspect.getargspec(fn)
+#        elif str(t) == "<type 'class'>":
+#            print "Class: " , key
+
+    #print "Module Info:  " , inspect.getmoduleinfo(information[0])
+    #print "ID:\t\t\t", id(item)
     print "TYPE:\t\t", type(item)
     #print "VALUE:\t\t", repr(item)
     if str(type(item)) == "<type 'function'>":
@@ -199,21 +262,82 @@ def interrogate(item):
         print "Yes"
     else:
         print "No"
-
 import ReadTestScript
+
+def interspect(item):
+    """Return module info.
+    This function return information about module.
+    It contains functions name with arguments or Classes names with methods.
+
+    """
+    if hasattr(item, '__name__'):
+        print "NAME: " , item.__name__
+    dict_member = {}
+    class_member = {}
+    method_member = {}
+    for key in dir(item):
+        if str(type(eval('item.' + key))) == "<type 'function'>":
+            #print "KEY: ", key
+            #print "ARGS: ", inspect.getargspec(eval('item.' + key))
+            dict_member[key] = inspect.getargspec(eval('item.' + key))
+            #print dict_member
+        elif str(type(eval('item.' + key))) == "<type 'classobj'>":
+            #print "KEY: ", key
+            class_member[key] =  eval('dir(item.' + key + ')')
+            for k in class_member[key]:
+                if str(type(eval('item.' + key + '.' + k))) == "<type 'instancemethod'>":
+                    method_member [k]=  (inspect.getargspec((eval('item.' + key + '.' + k))))
+                    #print "method: " , method_member[k]
+    return dict_member, class_member, method_member
+
+def cmp_function(sampler, task):
+    result = False
+    for i in range(3):
+        for key in sampler[i]:
+            if key in task[i]:
+                if sampler[i][key] == task[i][key]:
+                    result = True
+
+            else:
+                return False
+
+    return True
+
 
 
 if __name__ == "__main__":
     sampler = TestToolHelp('math_const')
-    stud = 'math_const_2'
+    sampler_data =  interspect(sampler.module)
+    stud = TestToolHelp('math_const_2')
+    stud_data = interspect(stud.module)
+
+    sampler_class = TestToolHelp('simple_class')
+
+    if (cmp_function(sampler_data, stud_data)):
+        sampler.report_2('run_math.txt', stud )
+
+    #print interspect(sampler_class.module)
 
 
-
+#    stud = 'math_const_2'
+#    teacher = 'class_for_testing'
+#    m = importlib.import_module(stud)
+#    interspect(m)
+#    cl = importlib.import_module(teacher)
     #run_math.txt - file with function names and arguments. Now it is parted via "<"
-    sampler.report_2('run_math.txt',  sampler.module, stud )
+#Comment only now..
+#    sampler.report_2('run_math.txt',  sampler.module, stud )
+    #module = importlib.import_module(name, path)
+#    tempScript = TestToolHelp('math_const')
+#    interrogate(interrogate2)
+    #interrogate2(tempScript.module)
+#    tempScrClass = TestToolHelp('class_for_testing')
+#    interrogate2(tempScrClass)
 
+        #<function interrogate at 0x2a388c0>
+        #print eval('tempScript.module.' + key)
 
-
+    #print inspect.getmoduleinfo(tempScript.path)
 #    interrogate(t.module)
 
     ################################################

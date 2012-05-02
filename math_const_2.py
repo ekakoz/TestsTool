@@ -4,7 +4,7 @@ __author__ = 'katrin'
 
 from math import *
 import sys, os
-def math_const(str="pi:5"):
+def math_const(str):
 
     try:
         str = str.split(':')
@@ -22,4 +22,6 @@ def math_const(str="pi:5"):
         print "Error"
         return "Error"
 
+def temp():
+    print 'ololo'
 

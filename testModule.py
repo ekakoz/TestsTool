@@ -1,8 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 __author__ = 'Kozlova Ekaterina'
 
 import test_math_dir
-
-import unittest, importlib, subprocess, sys, ReadTestScript, inspect
+import unittest, importlib, sys, ReadTestScript, inspect
 
 class TestToolHelp(unittest.TestCase):
 
@@ -53,7 +54,6 @@ class TestToolHelp(unittest.TestCase):
                 else: # work with usual functions
                     f2 = f(eval('self.module.' + f_name))#function
                 f3 = None
-                #if str(type(mark[i]['in'])) == "<type 'str'>":
                 if type(mark[i]['in']) == str:
                     f3 = f2(mark[i]['in']) #mark[i]['in'] it is argument.
                     ans.append(f3)
@@ -78,13 +78,14 @@ class TestToolHelp(unittest.TestCase):
 
     def __get_args__(self, list_args = []):
         res = ""
+        if len(list_args) == 0:
+            return res
         for key in list_args:
             if type(key) == str:
                 res = res + "\"" + str(key) + "\", "
             else:
                 res = res + str(key) + ", "
         res = res[:-2]
-        #print "RES " + res
         return res
 
     def __run_def__(self, curRun):
@@ -142,53 +143,46 @@ class TestToolHelp(unittest.TestCase):
         file_grade.write("\nRESULT GRADE = " + str(grade))
         file_grade.close()
 
-    def run_class(self, *args):
+    def report_class(self, class_name, student):
+        """
+
+
+        """
+
+        grade = 0
         mark = []
-        ans = []
-        sampler_data = args[0]
-        file_descriptor = open("OLOLO.txt", "w")
-        print len(sampler_data[1])
-        class_name = sampler_data[1].keys()
-        inst_cl = eval('self.module.' + class_name[0])
-        print type(inst_cl)
-        print eval('self.module.' + class_name[0] + '.test')
-        len_1 = len(eval('self.module.' + class_name[0] + '.test'))
-        for i in  range(len_1):
+        total_grade = 0
+        file_grade = open((str(student.module.__name__)+'.log'),"w")
+        for i in range(len(eval('self.module.' + class_name + '.test'))):
+            ans = []
+            mark.append(eval('self.module.' + class_name + '.test' + str([i])))
 
-            mark.append(eval('self.module.' + class_name[0] + '.test' + str([i])))
-            print 'self.module.' + class_name[0] + '.test' + str([i])
-            cl = ret_function((mark[i]['grade']))
-            len_in = len(eval('self.module.' + class_name[0] + '.test[' +str(i) + "]" + "['in']"))
-            for key in range():
-                print key
-#            cl2 = cl(eval('self.module.' + self.name))
-#            cl3 = cl2((mark[i]['in']))
-#            ans.append(f3)
-#            log = "\n>>> " + str(self.name) + "(" + mark[i]['in'] + ")"  +"\n" \
-#            + str(f3[0])
-#            file_description.write(log)
-#            file_description.close()
-#            return True
+            f = ret_function((mark[i]['grade'])) #grade, int
 
+            if str(type(eval('self.module.' + class_name))) == "<type 'classobj'>": # this for work with classes
+                f2 = f(eval('self.module.' + class_name))
+                ret = self.__get_args__(mark[i]['in'][class_name])
+                f3 = eval("f2(" + ret + ")")
+                ans_ap = (f3[0] , f3[1])
+                ans.append(ans_ap)
+                f_stud = ret_function(mark[i]['grade'])
+                f2_stud = f_stud(eval('student.module.' + class_name))
+                ret = self.__get_args__(mark[i]['in'][class_name])
+                f3_stud = eval("f2_stud(" + ret + ")")
+                if str(f3_stud[0]) == str(f3[0]):
+                    total_grade = total_grade + f3[1]
+                for meth in range(len(mark[i]['in']) - 1): #now call methods
+                    m = mark[i]['in'].keys()[meth + 1] #method name
+                    ret = self.__get_args__(mark[i]['in'][m]) # arguments
+                    f_cl2 = f(eval('f3[0].' + m)) #methods
+                    f_cl3 = eval("f_cl2(" + ret + ")") #arg of methods
+                    ans.append(f_cl3)
+                    point_dec = dec_call (ans[meth+1][1], ans[meth+1][0])
+                    f2_stud = point_dec(eval('f3_stud[0].' + m))
+                    fres_stud = eval("f2_stud(" + ret + ")")
+                    total_grade = total_grade + fres_stud
 
-#            for s in range(len(Person.test)):#import module!!!
-#                print "_______"
-#                for key in Person.test[s]['in']:
-#                    a = key + "("
-#                    b = False
-#                    for i in Person.test[s]['in'][key]:
-#                        t = str(i) + str(type(i))
-#                        if type(i) == str:
-#                            a = a + "\"" + i + "\", "
-#                        else:
-#                            a = a + str(i) + ", "
-#                        b = True
-#                    if b == True:
-#                        a = a[0:-2] + ")"
-#                        b = False
-#                    else:
-#                        a = a + ")"
-#                    print a
+        print "TOTAL_GRADE = " , total_grade
 
     @staticmethod
     def report_run_TC():
@@ -208,7 +202,6 @@ class TestToolHelp(unittest.TestCase):
         #s = sys.path
         log_file = str(sys.path[0]) + '/report_run_TC.txt'
         f = open(log_file, "a") #open file for appending log
-        #p = scr.listScriptsNames()
         for each in scr.listScriptsNames():
             f.writelines("\n\n" + str(each) + "\n")
             l = unittest.TestLoader().loadTestsFromTestCase(imp.TestCase)
@@ -246,27 +239,23 @@ def decorator_for_decorator(decor):
 def dec_call(fn, point, ans):
     """Decorator compare answers.
     It is return summary point for one run (with one set of arguments)
-    It works with function.
+    It works with function, also it compare <class_name>.__str__ if we have instance
 
     """
     def wrap(*args, **kwargs):
         try:
-            if fn(*args, **kwargs) == ans:
+
+            ret_fn = str(fn(*args, **kwargs))
+            if ret_fn == ans:
                 return point
-            t = inspect.getargspec(fn)
+            elif str(ret_fn) == str(ans):
+                return point
             grade = 0
             return grade
         except :
             grade = 0
             return grade
     return wrap
-#
-#@decorator_for_decorator
-#def ret_class(cl, point):
-#    def wrap(*args, **kwargs):
-#        return cl(*args, **kwargs), point
-#    return wrap
-
 
 @decorator_for_decorator
 def ret_function(fn, point):
@@ -277,7 +266,7 @@ def ret_function(fn, point):
 def interspect(item):
     """Return module info.
     This function return information about module.
-    It contains functions name with arguments or Classes names with methods.
+    It contains functions name with arguments or Classes names with it methods.
 
     """
     if hasattr(item, '__name__'):
@@ -305,7 +294,6 @@ def cmp_function(sampler, task):
                 if len(sampler[i][key].args) == len(task[i][key].args):
                     return True
                 elif len(sampler[i][key].args) <= len(task[i][key].args):
-                    #type" , type(task[i][key].defaults[0])#temprory. I want to know about type of arguments
                     log = open(key + '_compare' , "w")
                     log.write("Compare of two function is FALSE.\n")
                     log.write("SAMPLER " + str(sampler[i][key]) + "\n")
@@ -338,9 +326,24 @@ def compare_Class(sampler, task):
     Student task must contain >= count of methods with the same name to sampler.
 
     """
+    res = False
     for key in sampler[1]:
-        print key
-    #return True
+        for methods in sampler[1][key]:
+            if methods in task[1][key] or methods == 'test':
+                res = True
+            else:
+                return False
+
+    for keys in sampler[2]:
+        temp = (sampler[2][keys])
+        temp2 = (task[2][keys])
+        if len(temp.args) == len (temp2.args):
+            res = True
+        elif temp2.varargs <> None or temp2.keywords <> None:
+            res = True
+        else :
+            return False
+    return res
 
 def run_auto_check(*args):
     """
@@ -352,13 +355,12 @@ def run_auto_check(*args):
         if len(args) == 2:
             sampler = TestToolHelp(args[0])
             sampler_data =  interspect(sampler.module)
-            sampler.name = sampler_data[0].keys()[0]
             student = TestToolHelp(args[1])
             student_data = interspect(student.module)
-            student.name = student_data[0].keys()[0]
-
-            # first "if" for run compare two functions and after that run check teacher and student functions.
-            if sampler_data[0] <> None:
+            # first "if" for run compare two functions and after that run check student functions.
+            if sampler_data[0] <> {}:
+                sampler.name = sampler_data[0].keys()[0]
+                student.name = student_data[0].keys()[0]
                 if (cmp_function(sampler_data, student_data)):
                     sampler.report(sampler.name, student)
                 else:
@@ -366,6 +368,17 @@ def run_auto_check(*args):
                     stud_log.write("Definitions in your script is wrong.\nYour GRADE = 0.")
                     stud_log.close()
                     return "Error: False compare sampler and student scripts"
+            elif sampler_data[1] <> {}:
+                sampler.name = sampler_data[1].keys()[0]
+                student.name = student_data[1].keys()[0]
+                if (compare_Class(sampler_data, student_data)):
+                    sampler.report_class(sampler.name, student)
+                    print "OK"
+#                else:
+#                    stud_log = open(student.module.__name__ + ".log", "w")
+#                    stud_log.write("Definitions in your script is wrong.\nYour GRADE = 0.")
+#                    stud_log.close()
+#                    return "Error: False compare sampler and student scripts"
         elif len(args) == 1:
             sampler = TestToolHelp(args[0])
             sampler_data =  interspect(sampler.module)
@@ -396,7 +409,9 @@ if __name__ == "__main__":
     #run_auto_check('math_const', 'math_const_4')
     #run_auto_check('sampler_strToSock', 'strToSock_03')
     #run_auto_check('sampler_strToSock')
-    run_auto_check('person_class')
+    #run_auto_check('person_class')
+    run_auto_check('person_class','simple_class' )
+    #com = compare_Class(s_d, stud_d )
 #    sampler = TestToolHelp('math_const')
 #    sampler_data =  interspect(sampler.module)
 #    student = TestToolHelp('math_const_2')
